@@ -2,6 +2,7 @@ import { toyService } from './toy.service.js'
 import { logger } from '../../services/logger.service.js'
 
 export async function getToys(req, res) {
+    const queryOptions = _parseQueryParams(req.query)
     try {
         const toys = await toyService.query(queryOptions)
         res.send(toys)
@@ -93,4 +94,17 @@ export async function removeToyMsg(req, res) {
         logger.error('Failed to remove toy msg', err)
         res.status(500).send({ err: 'Failed to remove toy msg' })
     }
+}
+
+function _parseQueryParams(queryParams) {
+    const filterBy = {
+        txt: queryParams.txt || '',
+        maxPrice: queryParams.maxPrice || Infinity,
+        labels: queryParams.labels || [],
+        inStock: queryParams.inStock || '',
+
+        pageIdx: queryParams.pageIdx !== undefined ? +queryParams.pageIdx : undefined,
+        pageSize: queryParams.pageSize !== undefined ? +queryParams.pageSize : undefined,
+    }
+    return { filterBy }
 }

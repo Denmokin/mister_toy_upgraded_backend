@@ -4,7 +4,7 @@ import { dbService } from '../../services/db.service.js'
 import { logger } from '../../services/logger.service.js'
 import { makeId } from '../../services/util.service.js'
 
-export const Service = {
+export const toyService = {
 	query,
 	getById,
 	remove,
@@ -16,14 +16,14 @@ export const Service = {
 
 async function query({ filterBy = {} } = {}) {
 	try {
-
-		const collection = await dbService.getCollection('toyStore')
+		const collection = await dbService.getCollection('toys')
 
 		const criteria = _buildCriteria(filterBy)
 
-		const totalToys = collection.countDocument(criteria)
+		const totalToys = await collection.countDocuments(criteria)
 
-		const cursor = collection.find(criteria)
+		let cursor = collection.find(criteria)
+		// console.log('cursor: ', cursor)
 
 		let totalPages = 1
 
@@ -36,6 +36,7 @@ async function query({ filterBy = {} } = {}) {
 		}
 
 		const toys = await cursor.toArray()
+		console.log('toys: ', toys)
 		return { toys, totalPages }
 
 	} catch (err) {
@@ -46,7 +47,7 @@ async function query({ filterBy = {} } = {}) {
 
 async function getById(toyId) {
 	try {
-		const collection = await dbService.getCollection('toyStore')
+		const collection = await dbService.getCollection('toys')
 		const toy = await collection.findOne({ _id: ObjectId.createFromHexString(toyId) })
 		toy.createdAt = toy._id.getTimestamp()
 		return toy
@@ -58,7 +59,7 @@ async function getById(toyId) {
 
 async function remove(toyId) {
 	try {
-		const collection = await dbService.getCollection('toyStore')
+		const collection = await dbService.getCollection('toys')
 		const { deletedCount } = await collection.deleteOne({ _id: ObjectId.createFromHexString(toyId) })
 		return deletedCount
 	} catch (err) {
@@ -69,7 +70,7 @@ async function remove(toyId) {
 
 async function add(toy) {
 	try {
-		const collection = await dbService.getCollection('toyStore')
+		const collection = await dbService.getCollection('toys')
 		await collection.insertOne(toy)
 		return toy
 	} catch (err) {
@@ -81,7 +82,7 @@ async function add(toy) {
 async function update(toy) {
 	try {
 		const toyToUpdate = toy
-		const collection = await dbService.getCollection('toyStore')
+		const collection = await dbService.getCollection('toys')
 		await collection.updateOne({ _id: ObjectId.createFromHexString(toy._id) }, { $set: toyToUpdate })
 		return toy
 	} catch (err) {
@@ -94,7 +95,7 @@ async function addMsg(Id, msg) {
 	try {
 		msg.id = makeId()
 
-		const collection = await dbService.getCollection('toyStore')
+		const collection = await dbService.getCollection('toys')
 		await collection.updateOne(
 			{ _id: ObjectId.createFromHexString(Id) },
 			{ $push: { msgs: msg } })
@@ -107,7 +108,7 @@ async function addMsg(Id, msg) {
 
 async function removeMsg(Id, msgId) {
 	try {
-		const collection = await dbService.getCollection('toyStore')
+		const collection = await dbService.getCollection('toys')
 		await collection.updateOne(
 			{ _id: ObjectId.createFromHexString(Id) },
 			{ $pull: { msgs: { id: msgId } } })
@@ -121,16 +122,12 @@ async function removeMsg(Id, msgId) {
 function _buildCriteria(filterBy) {
 	const criteria = {}
 
-	if (filterBy.creatorId) {
-		criteria['creator._id'] = ObjectId.createFromHexString(filterBy.creatorId)
-	}
-
 	if (filterBy.txt) {
 		criteria.name = { $regex: filterBy.txt, $options: 'i' }
 	}
 
-	if (filterBy.inStock !== undefined & filterBy.inStock !== '') {
-		criteria.inStock = true
+	if (filterBy.inStock !== undefined && filterBy.inStock !== '') {
+		criteria.inStock = filterBy.inStock === 'true' || filterBy.inStock === true
 	}
 
 	if (filterBy.labels?.length && !filterBy.labels.includes('')) {
@@ -138,7 +135,7 @@ function _buildCriteria(filterBy) {
 	}
 
 	if (filterBy.maxPrice) {
-		criteria.maxPrice = { $lte: +filterBy.maxPrice }
+		criteria.price = { $lte: +filterBy.maxPrice }
 	}
 
 	return criteria
