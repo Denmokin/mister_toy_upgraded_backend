@@ -23,7 +23,6 @@ async function query({ filterBy = {} } = {}) {
 		const totalToys = await collection.countDocuments(criteria)
 
 		let cursor = collection.find(criteria)
-		// console.log('cursor: ', cursor)
 
 		let totalPages = 1
 
@@ -36,7 +35,6 @@ async function query({ filterBy = {} } = {}) {
 		}
 
 		const toys = await cursor.toArray()
-		console.log('toys: ', toys)
 		return { toys, totalPages }
 
 	} catch (err) {
@@ -81,7 +79,7 @@ async function add(toy) {
 
 async function update(toy) {
 	try {
-		const toyToUpdate = toy
+		const { _id, ...toyToUpdate } = toy
 		const collection = await dbService.getCollection('toys')
 		await collection.updateOne({ _id: ObjectId.createFromHexString(toy._id) }, { $set: toyToUpdate })
 		return toy

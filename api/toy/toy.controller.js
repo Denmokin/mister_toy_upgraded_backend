@@ -27,9 +27,9 @@ export async function getToyById(req, res) {
 
 export async function removeToy(req, res) {
     const { id } = req.params
-    const loggedInUser = req.verifiedUser
+    const { loggedinUser } = req
     try {
-        await toyService.remove(id, loggedInUser)
+        await toyService.remove(id, loggedinUser)
         res.send({ msg: 'Toy removed', toyId: id })
     }
     catch (err) {
@@ -43,7 +43,7 @@ export async function addToy(req, res) {
     const { loggedinUser } = req
 
     try {
-        const toyToSave = await toyService.save(toy, loggedInUser)
+        const toyToSave = await toyService.add(toy, loggedinUser)
         res.send(toyToSave)
     }
     catch (err) {
@@ -57,7 +57,7 @@ export async function updateToy(req, res) {
     const { loggedinUser } = req
 
     try {
-        const toyToUpdate = await toyService.save(toy, loggedInUser)
+        const toyToUpdate = await toyService.update(toy, loggedinUser)
         res.send(toyToUpdate)
     }
     catch (err) {
