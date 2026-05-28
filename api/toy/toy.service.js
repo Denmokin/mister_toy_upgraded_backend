@@ -118,6 +118,7 @@ async function removeMsg(Id, msgId) {
 }
 
 function _buildCriteria(filterBy) {
+
 	const criteria = {}
 
 	if (filterBy.txt) {
@@ -127,6 +128,7 @@ function _buildCriteria(filterBy) {
 	if (filterBy.inStock !== undefined && filterBy.inStock !== '') {
 		criteria.inStock = filterBy.inStock === 'true' || filterBy.inStock === true
 	}
+
 
 	if (filterBy.labels?.length && !filterBy.labels.includes('')) {
 		criteria.labels = { $in: filterBy.labels }

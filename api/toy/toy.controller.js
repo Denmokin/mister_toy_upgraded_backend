@@ -97,10 +97,18 @@ export async function removeToyMsg(req, res) {
 }
 
 function _parseQueryParams(queryParams) {
+
+    const rawLabels = queryParams.labels
+
+    let labelArray = []
+    if (rawLabels) {
+        labelArray = Array.isArray(rawLabels) ? rawLabels : [rawLabels]
+    }
+
     const filterBy = {
         txt: queryParams.txt || '',
         maxPrice: queryParams.maxPrice || Infinity,
-        labels: queryParams.labels || [],
+        labels: labelArray,
         inStock: queryParams.inStock || '',
 
         pageIdx: queryParams.pageIdx !== undefined ? +queryParams.pageIdx : undefined,
