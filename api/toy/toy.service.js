@@ -10,8 +10,8 @@ export const toyService = {
 	remove,
 	add,
 	update,
-	addMsg,
-	removeMsg,
+	addToyMsg,
+	removeToyMsg,
 }
 
 async function query({ filterBy = {} } = {}) {
@@ -89,7 +89,7 @@ async function update(toy) {
 	}
 }
 
-async function addMsg(Id, msg) {
+async function addToyMsg(Id, msg) {
 	try {
 		msg.id = makeId()
 
@@ -104,7 +104,7 @@ async function addMsg(Id, msg) {
 	}
 }
 
-async function removeMsg(Id, msgId) {
+async function removeToyMsg(Id, msgId) {
 	try {
 		const collection = await dbService.getCollection('toys')
 		await collection.updateOne(
