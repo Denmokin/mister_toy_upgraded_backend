@@ -16,7 +16,7 @@ export const toyService = {
 
 async function query({ filterBy = {} } = {}) {
 	try {
-		const collection = await dbService.getCollection('toys')
+		const collection = await dbService.getCollection('toy')
 
 		const criteria = _buildCriteria(filterBy)
 
@@ -45,7 +45,7 @@ async function query({ filterBy = {} } = {}) {
 
 async function getById(toyId) {
 	try {
-		const collection = await dbService.getCollection('toys')
+		const collection = await dbService.getCollection('toy')
 		const toy = await collection.findOne({ _id: ObjectId.createFromHexString(toyId) })
 		toy.createdAt = toy._id.getTimestamp()
 		return toy
@@ -57,7 +57,7 @@ async function getById(toyId) {
 
 async function remove(toyId) {
 	try {
-		const collection = await dbService.getCollection('toys')
+		const collection = await dbService.getCollection('toy')
 		const { deletedCount } = await collection.deleteOne({ _id: ObjectId.createFromHexString(toyId) })
 		return deletedCount
 	} catch (err) {
@@ -68,7 +68,7 @@ async function remove(toyId) {
 
 async function add(toy) {
 	try {
-		const collection = await dbService.getCollection('toys')
+		const collection = await dbService.getCollection('toy')
 		await collection.insertOne(toy)
 		return toy
 	} catch (err) {
@@ -80,7 +80,7 @@ async function add(toy) {
 async function update(toy) {
 	try {
 		const { _id, ...toyToUpdate } = toy
-		const collection = await dbService.getCollection('toys')
+		const collection = await dbService.getCollection('toy')
 		await collection.updateOne({ _id: ObjectId.createFromHexString(toy._id) }, { $set: toyToUpdate })
 		return toy
 	} catch (err) {
@@ -93,7 +93,7 @@ async function addToyMsg(Id, msg) {
 	try {
 		msg.id = makeId()
 
-		const collection = await dbService.getCollection('toys')
+		const collection = await dbService.getCollection('toy')
 		await collection.updateOne(
 			{ _id: ObjectId.createFromHexString(Id) },
 			{ $push: { msgs: msg } })
@@ -106,7 +106,7 @@ async function addToyMsg(Id, msg) {
 
 async function removeToyMsg(Id, msgId) {
 	try {
-		const collection = await dbService.getCollection('toys')
+		const collection = await dbService.getCollection('toy')
 		await collection.updateOne(
 			{ _id: ObjectId.createFromHexString(Id) },
 			{ $pull: { msgs: { id: msgId } } })
